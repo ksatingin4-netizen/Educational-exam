@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<title>Edu Ultimate Exam System</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#16222a,#3a6073);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+.app{
+    background:white;
+    width:700px;
+    height:90vh;
+    overflow:auto;
+    padding:20px;
+    border-radius:15px;
+}
+h2{text-align:center;}
+.question{margin-bottom:15px;}
+label{display:block;margin-left:10px;}
+button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    background:#16222a;
+    color:white;
+}
+.result{
+    margin-top:15px;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+<h2>🎓 EDU ULTIMATE EXAM</h2>
+
+<div id="menu">
+<p>Piliin ang Baitang:</p>
+<button type="button" onclick="startExam(10)">Grade 10</button>
+<button type="button" onclick="startExam(11)">Grade 11</button>
+<button type="button" onclick="startExam(12)">Grade 12</button>
+</div>
+
+<form id="examForm"></form>
+<div class="result" id="result"></div>
+</div>
+
+<script>
+
+const subjects = {
+10:["Math","Science","English","Filipino","Araling Panlipunan","TLE","ESP","MAPEH"],
+11:["General Math","Earth Science","Oral Communication","Komunikasyon","UCSP","PE","Statistics","Reading and Writing"],
+12:["Pre-Calculus","Physics","21st Century Lit","Contemporary PH Arts","Entrepreneurship","Media and Info Lit","Research","PE"]
+};
+
+function generateQuestion(subject,grade,number){
+    return {
+        q:`[G${grade} - ${subject}] Question ${number}: Ano ang tamang sagot sa advanced concept ng ${subject}?`,
+        choices:[
+            "Option A",
+            "Option B",
+            "Option C",
+            "Option D"
+        ],
+        answer:"Option A"
+    };
+}
+
+let currentData=[];
+
+function startExam(grade){
+    let form=document.getElementById("examForm");
+    form.innerHTML="";
+    document.getElementById("result").innerHTML="";
+    currentData=[];
+
+    let questionNumber=1;
+
+    subjects[grade].forEach(subject=>{
+        for(let i=1;i<=Math.floor(50/subjects[grade].length);i++){
+            currentData.push(generateQuestion(subject,grade,questionNumber));
+            questionNumber++;
+        }
+    });
+
+    while(currentData.length<50){
+        currentData.push(generateQuestion("Mixed Subject",grade,questionNumber));
+        questionNumber++;
+    }
+
+    currentData.forEach((item,index)=>{
+        form.innerHTML+=`
+        <div class="question">
+        <p><b>${index+1}. ${item.q}</b></p>
+        ${item.choices.map(choice=>`
+        <label>
+        <input type="radio" name="q${index}" value="${choice}">
+        ${choice}
+        </label>
+        `).join("")}
+        </div>
+        `;
+    });
+
+    form.innerHTML+=`<button type="button" onclick="submitExam()">Submit Exam</button>`;
+}
+
+function submitExam(){
+    let score=0;
+
+    currentData.forEach((item,index)=>{
+        let selected=document.querySelector(\`input[name="q\${index}"]:checked\`);
+        if(selected && selected.value===item.answer){
+            score++;
+        }
+    });
+
+    let grade=(score/50)*100;
+
+    document.getElementById("result").innerHTML=
+    \`📊 Score: \${score}/50 <br>
+     🏆 Grade: \${grade.toFixed(0)}%\`;
+}
+
+</script>
+</body>
+</html>
